@@ -1,0 +1,11 @@
+prescription_id,drug_name,drug_category,formulary_tier,generic_available,typical_copay_tier1,typical_copay_tier2,typical_copay_tier3,typical_copay_tier4,prior_auth_required
+1,Metformin,Diabetes,1,TRUE,10,25,50,100,FALSE
+2,Lisinopril,Hypertension,1,TRUE,10,25,50,100,FALSE
+3,Atorvastatin,Cholesterol,1,TRUE,10,25,50,100,FALSE
+4,Humira,Autoimmune,4,FALSE,10,25,50,500,TRUE
+5,Eliquis,Anticoagulant,3,FALSE,10,25,75,150,FALSE
+6,Jardiance,Diabetes,3,FALSE,10,25,75,150,FALSE
+7,Albuterol,Respiratory,1,TRUE,10,25,50,100,FALSE
+8,Synthroid,Thyroid,1,TRUE,10,25,50,100,FALSE
+9,Xarelto,Anticoagulant,3,FALSE,10,25,75,150,TRUE
+10,Ozempic,Diabetes,4,FALSE,10,25,50,300,TRUE

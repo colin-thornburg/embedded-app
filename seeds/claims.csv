@@ -1,0 +1,19 @@
+claim_id,member_id,company_id,claim_date,claim_type,provider_name,diagnosis_code,diagnosis_description,claim_amount,paid_amount,member_responsibility,claim_status,service_date
+1001,10001,1001,2024-01-15,Medical,St. Mary's Hospital,M79.3,Shoulder pain,1500,1200,300,Paid,2024-01-10
+1002,10001,1001,2024-02-20,Medical,Orthopedic Associates,M79.3,Physical therapy,400,320,80,Paid,2024-02-15
+1003,10001,1001,2024-03-10,Prescription,CVS Pharmacy,E11.9,Metformin prescription,120,100,20,Paid,2024-03-10
+1004,10002,1001,2024-01-25,Medical,Primary Care Clinic,J06.9,Annual checkup,250,200,50,Paid,2024-01-25
+1005,10003,1001,2024-02-05,Medical,Pediatric Care Center,J06.9,Upper respiratory infection,150,120,30,Paid,2024-02-05
+1006,10004,1001,2024-01-30,Medical,Women's Health Center,Z01.419,Preventive care,350,350,0,Paid,2024-01-30
+1007,10004,1001,2024-04-15,Prescription,Walgreens,N/A,Birth control prescription,50,40,10,Paid,2024-04-15
+1008,10005,1001,2024-03-22,Medical,Urgent Care Center,J20.9,Bronchitis treatment,200,160,40,Paid,2024-03-22
+2001,20001,1002,2024-01-10,Medical,Regional Medical Center,I10,Hypertension management,300,240,60,Paid,2024-01-10
+2002,20001,1002,2024-02-15,Prescription,CVS Pharmacy,I10,Lisinopril prescription,30,24,6,Paid,2024-02-15
+2003,20002,1002,2024-03-05,Medical,Women's Clinic,O80,Prenatal visit,400,320,80,Paid,2024-03-05
+2004,20003,1002,2024-01-20,Medical,QuickCare Clinic,J06.9,Cold symptoms,100,70,30,Paid,2024-01-20
+2005,20004,1002,2024-04-01,Medical,Back & Spine Center,M54.5,Lower back pain,600,420,180,Paid,2024-04-01
+3001,30001,1003,2024-02-10,Medical,Industrial Health Clinic,M54.5,Work-related back strain,450,405,45,Paid,2024-02-10
+3002,30001,1003,2024-03-15,Prescription,Walmart Pharmacy,M54.5,Muscle relaxant prescription,60,54,6,Paid,2024-03-15
+3003,30002,1003,2024-01-28,Medical,Regional Hospital,E78.5,Cholesterol screening,200,180,20,Paid,2024-01-28
+3004,30003,1003,2024-02-25,Medical,Occupational Health,Z00.00,Annual physical,300,270,30,Paid,2024-02-25
+3005,30004,1003,2024-03-30,Medical,Allergy & Asthma Center,J45.909,Asthma management,250,225,25,Paid,2024-03-30

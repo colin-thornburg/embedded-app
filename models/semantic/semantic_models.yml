@@ -1,0 +1,185 @@
+version: 2
+
+semantic_models:
+  - name: member_claims
+    description: "Claims data with RLS for members"
+    model: ref('fct_claims')
+    defaults:
+      agg_time_dimension: claim_date
+    
+    entities:
+      - name: claim
+        type: primary
+        expr: claim_id
+      - name: member
+        type: foreign
+        expr: member_id
+      - name: company
+        type: foreign
+        expr: company_id
+    
+    dimensions:
+      - name: claim_date
+        type: time
+        type_params:
+          time_granularity: day
+        expr: claim_date
+      - name: claim_type
+        type: categorical
+        expr: claim_type
+      - name: claim_status
+        type: categorical
+        expr: claim_status
+      - name: provider_name
+        type: categorical
+        expr: provider_name
+      - name: diagnosis_description
+        type: categorical
+        expr: diagnosis_description
+    
+    measures:
+      - name: total_claims
+        description: "Total claim amount"
+        agg: sum
+        expr: claim_amount
+      - name: paid_amount
+        description: "Amount paid by insurance"
+        agg: sum
+        expr: paid_amount
+      - name: member_responsibility
+        description: "Amount owed by member"
+        agg: sum
+        expr: member_responsibility
+      - name: claim_count
+        description: "Number of claims"
+        agg: count
+        expr: claim_id
+
+  - name: member_details
+    description: "Member information with plan details"
+    model: ref('dim_members')
+    
+    entities:
+      - name: member
+        type: primary
+        expr: member_id
+      - name: company
+        type: foreign
+        expr: company_id
+      - name: plan
+        type: foreign
+        expr: plan_id
+    
+    dimensions:
+      - name: first_name
+        type: categorical
+        expr: first_name
+      - name: last_name
+        type: categorical
+        expr: last_name
+      - name: email
+        type: categorical
+        expr: email
+      - name: department
+        type: categorical
+        expr: department
+      - name: plan_type
+        type: categorical
+        expr: plan_type
+      - name: is_primary
+        type: categorical
+        expr: is_primary
+      - name: company_name
+        type: categorical
+        expr: company_name
+      - name: enrollment_date
+        type: time
+        type_params:
+          time_granularity: day
+        expr: enrollment_date
+    
+    defaults:
+      agg_time_dimension: enrollment_date
+    
+    measures:
+      - name: member_count
+        description: "Count of members"
+        agg: count_distinct
+        expr: member_id
+
+  - name: plan_details
+    description: "Health plan information"
+    model: ref('dim_plans')
+    
+    entities:
+      - name: plan
+        type: primary
+        expr: plan_id
+      - name: company
+        type: foreign
+        expr: company_id
+    
+    dimensions:
+      - name: plan_name
+        type: categorical
+        expr: plan_name
+      - name: plan_type
+        type: categorical
+        expr: plan_type
+      - name: coinsurance_percentage
+        type: categorical
+        expr: coinsurance_percentage
+      - name: copay_primary
+        type: categorical
+        expr: copay_primary
+      - name: copay_specialist
+        type: categorical
+        expr: copay_specialist
+      - name: plan_created_date
+        type: time
+        type_params:
+          time_granularity: day
+        expr: "CURRENT_DATE()"  # Since plans don't have creation dates, use current date
+    
+    defaults:
+      agg_time_dimension: plan_created_date
+    
+    measures:
+      - name: annual_deductible
+        description: "Annual deductible for individual"
+        agg: max
+        expr: annual_deductible_individual
+      - name: oop_max
+        description: "Out of pocket maximum for individual"
+        agg: max
+        expr: oop_max_individual
+      - name: monthly_premium
+        description: "Monthly premium for employee"
+        agg: max
+        expr: premium_monthly_employee
+
+metrics:
+  - name: deductible_met
+    description: "Amount of deductible met YTD"
+    type: simple
+    label: "Deductible Met"
+    type_params:
+      measure: member_responsibility
+    filter: |
+      {{ Dimension('member_claims__claim_date') }} >= '2024-01-01'
+  
+  - name: oop_spent
+    description: "Out of pocket spent YTD"
+    type: simple
+    label: "OOP Spent"
+    type_params:
+      measure: member_responsibility
+    filter: |
+      {{ Dimension('member_claims__claim_date') }} >= '2024-01-01'
+  
+  - name: claims_by_type
+    description: "Claims breakdown by type"
+    type: simple
+    label: "Claims by Type"
+    type_params:
+      measure: claim_count
