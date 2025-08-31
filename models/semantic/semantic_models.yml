@@ -8,27 +8,22 @@ semantic_models:
       agg_time_dimension: claim_date
     
     entities:
-      - name: member
+      - name: claim
         type: primary
+        expr: claim_id
+      - name: member
+        type: foreign
         expr: member_id
       - name: company
         type: foreign
         expr: company_id
-      - name: claim
-        type: primary
-        expr: claim_id
     
     dimensions:
-      - name: member_id
-        type: categorical
-        expr: member_id
-      - name: company_id
-        type: categorical
-        expr: company_id
       - name: claim_date
         type: time
         type_params:
           time_granularity: day
+        expr: claim_date
       - name: claim_type
         type: categorical
         expr: claim_type
@@ -41,12 +36,6 @@ semantic_models:
       - name: diagnosis_description
         type: categorical
         expr: diagnosis_description
-      - name: plan_type
-        type: categorical
-        expr: plan_type
-      - name: department
-        type: categorical
-        expr: department
     
     measures:
       - name: total_claims
@@ -77,26 +66,23 @@ semantic_models:
       - name: company
         type: foreign
         expr: company_id
+      - name: plan
+        type: foreign
+        expr: plan_id
     
     dimensions:
-      - name: member_id
-        type: categorical
-        expr: member_id
-      - name: company_id
-        type: categorical
-        expr: company_id
       - name: first_name
         type: categorical
         expr: first_name
       - name: last_name
         type: categorical
         expr: last_name
+      - name: email
+        type: categorical
+        expr: email
       - name: department
         type: categorical
         expr: department
-      - name: plan_id
-        type: categorical
-        expr: plan_id
       - name: plan_type
         type: categorical
         expr: plan_type
@@ -106,6 +92,14 @@ semantic_models:
       - name: company_name
         type: categorical
         expr: company_name
+      - name: enrollment_date
+        type: time
+        type_params:
+          time_granularity: day
+        expr: enrollment_date
+    
+    defaults:
+      agg_time_dimension: enrollment_date
     
     measures:
       - name: member_count
@@ -126,18 +120,29 @@ semantic_models:
         expr: company_id
     
     dimensions:
-      - name: plan_id
-        type: categorical
-        expr: plan_id
-      - name: company_id
-        type: categorical
-        expr: company_id
       - name: plan_name
         type: categorical
         expr: plan_name
       - name: plan_type
         type: categorical
         expr: plan_type
+      - name: coinsurance_percentage
+        type: categorical
+        expr: coinsurance_percentage
+      - name: copay_primary
+        type: categorical
+        expr: copay_primary
+      - name: copay_specialist
+        type: categorical
+        expr: copay_specialist
+      - name: plan_created_date
+        type: time
+        type_params:
+          time_granularity: day
+        expr: "CURRENT_DATE()"  # Since plans don't have creation dates, use current date
+    
+    defaults:
+      agg_time_dimension: plan_created_date
     
     measures:
       - name: annual_deductible
