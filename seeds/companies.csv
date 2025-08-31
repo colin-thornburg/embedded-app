@@ -1,0 +1,4 @@
+company_id,company_name,industry,employee_count,primary_plan_type,logo_url,brand_color
+1001,TechCorp,Technology,50,PPO,https://via.placeholder.com/150/0066cc/ffffff?text=TechCorp,#0066cc
+1002,RetailPlus,Retail,200,HDHP,https://via.placeholder.com/150/ff6600/ffffff?text=RetailPlus,#ff6600
+1003,ManufacturingCo,Manufacturing,150,HMO,https://via.placeholder.com/150/009900/ffffff?text=MfgCo,#009900
