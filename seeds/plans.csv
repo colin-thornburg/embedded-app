@@ -1,0 +1,7 @@
+plan_id,company_id,plan_name,plan_type,annual_deductible_individual,annual_deductible_family,oop_max_individual,oop_max_family,premium_monthly_employee,premium_monthly_family,coinsurance_percentage,copay_primary,copay_specialist,copay_emergency,prescription_coverage
+2001,1001,TechCorp PPO Plus,PPO,1500,3000,4000,8000,150,450,80,30,50,250,TRUE
+2002,1001,TechCorp HDHP,HDHP,3000,6000,5000,10000,75,225,90,0,0,0,TRUE
+2003,1002,RetailPlus Standard,HDHP,2500,5000,6000,12000,100,300,80,40,60,300,TRUE
+2004,1002,RetailPlus Basic,HDHP,4000,8000,7000,14000,50,150,70,50,75,400,TRUE
+2005,1003,ManufacturingCo HMO,HMO,500,1000,3000,6000,125,375,90,20,40,200,TRUE
+2006,1003,ManufacturingCo PPO,PPO,2000,4000,5000,10000,175,525,80,35,55,300,TRUE

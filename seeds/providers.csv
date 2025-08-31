@@ -1,0 +1,11 @@
+provider_id,provider_name,specialty,address,city,state,zip,phone,network_status_techcorp,network_status_retailplus,network_status_manufacturingco,accepting_new_patients,quality_rating
+1,St. Mary's Hospital,Hospital,123 Medical Center Dr,San Francisco,CA,94102,415-555-0100,In-Network,In-Network,In-Network,TRUE,4.5
+2,Orthopedic Associates,Orthopedics,456 Bone St,San Francisco,CA,94103,415-555-0200,In-Network,Out-of-Network,In-Network,TRUE,4.8
+3,Primary Care Clinic,Primary Care,789 Health Ave,San Francisco,CA,94104,415-555-0300,In-Network,In-Network,Out-of-Network,TRUE,4.2
+4,CVS Pharmacy,Pharmacy,321 Main St,San Francisco,CA,94105,415-555-0400,In-Network,In-Network,In-Network,TRUE,4.0
+5,Walgreens,Pharmacy,654 Market St,San Francisco,CA,94106,415-555-0500,In-Network,In-Network,In-Network,TRUE,4.1
+6,Regional Medical Center,Hospital,987 Regional Blvd,Oakland,CA,94601,510-555-0600,Out-of-Network,In-Network,In-Network,TRUE,4.3
+7,Women's Health Center,OB/GYN,147 Women's Way,San Francisco,CA,94107,415-555-0700,In-Network,In-Network,In-Network,FALSE,4.7
+8,Pediatric Care Center,Pediatrics,258 Kids Ln,San Francisco,CA,94108,415-555-0800,In-Network,In-Network,In-Network,TRUE,4.6
+9,Urgent Care Center,Urgent Care,369 Quick Fix Rd,San Francisco,CA,94109,415-555-0900,In-Network,In-Network,In-Network,TRUE,3.9
+10,Back & Spine Center,Orthopedics,741 Spine St,San Francisco,CA,94110,415-555-1000,In-Network,Out-of-Network,In-Network,TRUE,4.4
