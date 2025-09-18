@@ -13,5 +13,5 @@ SELECT
     dependent_of,
     department,
     annual_salary,
-    CURRENT_TIMESTAMP() as loaded_at
+    CURRENT_TIMESTAMP as loaded_at
 FROM {{ ref('members') }}
