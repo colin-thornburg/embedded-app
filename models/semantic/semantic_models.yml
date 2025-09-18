@@ -139,7 +139,7 @@ semantic_models:
         type: time
         type_params:
           time_granularity: day
-        expr: "CURRENT_DATE()"  # Since plans don't have creation dates, use current date
+        expr: "CURRENT_DATE"  # Since plans don't have creation dates, use current date
     
     defaults:
       agg_time_dimension: plan_created_date
@@ -166,7 +166,7 @@ metrics:
     type_params:
       measure: member_responsibility
     filter: |
-      {{ Dimension('claim__claim_date') }} >= '2024-01-01'
+      {{ Dimension('claim_date') }} >= '2024-01-01'
   
   - name: oop_spent
     description: "Out of pocket spent YTD"
@@ -175,7 +175,7 @@ metrics:
     type_params:
       measure: member_responsibility
     filter: |
-      {{ Dimension('claim__claim_date') }} >= '2024-01-01'
+      {{ Dimension('claim_date') }} >= '2024-01-01'
   
   - name: claims_by_type
     description: "Claims breakdown by type"

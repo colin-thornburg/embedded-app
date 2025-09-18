@@ -14,5 +14,5 @@ SELECT
     copay_specialist,
     copay_emergency,
     prescription_coverage,
-    CURRENT_TIMESTAMP() as loaded_at
+    CURRENT_TIMESTAMP as loaded_at
 FROM {{ ref('plans') }}
