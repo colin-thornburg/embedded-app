@@ -15,6 +15,14 @@ logger = logging.getLogger(__name__)
 def get_snowflake_connection():
     """Get Snowflake connection using cached resource"""
     try:
+        # Check if all required config values are present
+        required_keys = ["account", "user", "password", "warehouse", "database", "schema", "role"]
+        missing_keys = [key for key in required_keys if not DB_CONFIG.get(key)]
+        
+        if missing_keys:
+            st.warning(f"Missing database configuration: {', '.join(missing_keys)}")
+            return None
+            
         conn = snowflake.connector.connect(
             account=DB_CONFIG["account"],
             user=DB_CONFIG["user"],
@@ -26,8 +34,8 @@ def get_snowflake_connection():
         )
         return conn
     except Exception as e:
-        st.error(f"Failed to connect to Snowflake: {str(e)}")
-        logger.error(f"Database connection error: {str(e)}")
+        st.warning(f"Database connection not available: {str(e)}")
+        logger.warning(f"Database connection error: {str(e)}")
         return None
 
 @st.cache_resource
