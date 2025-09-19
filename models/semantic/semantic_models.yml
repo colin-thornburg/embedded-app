@@ -166,7 +166,7 @@ metrics:
     type_params:
       measure: member_responsibility
     filter: |
-      {{ Dimension('member_claims.claim_date') }} >= '2024-01-01'
+      {{ Dimension('claim__claim_date') }} >= '2024-01-01'
   
   - name: oop_spent
     description: "Out of pocket spent YTD"
@@ -175,7 +175,7 @@ metrics:
     type_params:
       measure: member_responsibility
     filter: |
-      {{ Dimension('member_claims.claim_date') }} >= '2024-01-01'
+      {{ Dimension('claim__claim_date') }} >= '2024-01-01'
   
   - name: claims_by_type
     description: "Claims breakdown by type"
