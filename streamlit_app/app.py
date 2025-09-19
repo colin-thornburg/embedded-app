@@ -312,6 +312,9 @@ def show_semantic_layer():
     """Semantic layer exploration page"""
     st.header("🔗 dbt Semantic Layer")
     
+    # Demo mode indicator
+    st.info("🎯 **Demo Mode**: This showcases dbt Semantic Layer capabilities with realistic healthcare data. In production, this would connect to your actual dbt Cloud semantic layer.")
+    
     try:
         # Get available metrics
         st.subheader("📊 Available Metrics")
