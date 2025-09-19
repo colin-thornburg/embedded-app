@@ -33,17 +33,22 @@ class DbtSemanticLayer:
     def list_metrics(self) -> List[Dict]:
         """List available metrics from the semantic layer"""
         try:
-            url = f"https://{self.semantic_layer_host}/api/v1/metrics"
-            params = {"environment_id": self.environment_id}
+            # Use dbt Cloud API instead of semantic layer API
+            url = f"https://cloud.getdbt.com/api/v2/accounts/{self.environment_id}/semantic-layer/metrics"
             
-            response = requests.get(url, headers=self._get_headers(), params=params)
+            response = requests.get(url, headers=self._get_headers())
             response.raise_for_status()
             
             return response.json().get("data", [])
         except Exception as e:
-            st.error(f"Failed to list metrics: {str(e)}")
-            logger.error(f"Error listing metrics: {str(e)}")
-            return []
+            st.warning(f"Semantic layer not available: {str(e)}")
+            logger.warning(f"Error listing metrics: {str(e)}")
+            # Return sample metrics for demo
+            return [
+                {"name": "deductible_met", "description": "Amount of deductible met YTD"},
+                {"name": "oop_spent", "description": "Out of pocket spent YTD"},
+                {"name": "claims_by_type", "description": "Claims breakdown by type"}
+            ]
     
     def list_dimensions(self, metric_names: List[str]) -> List[Dict]:
         """List available dimensions for given metrics"""
@@ -71,32 +76,33 @@ class DbtSemanticLayer:
                      limit: Optional[int] = None) -> pd.DataFrame:
         """Query metrics from the semantic layer"""
         try:
-            url = f"https://{self.semantic_layer_host}/api/v1/query"
+            # For now, return sample data since semantic layer API is not available
+            # In production, this would query the actual semantic layer
+            st.info("Using sample data - semantic layer integration in development")
             
-            payload = {
-                "environment_id": self.environment_id,
-                "metrics": metrics
+            # Generate sample data based on requested metrics
+            import numpy as np
+            import pandas as pd
+            from datetime import datetime, timedelta
+            
+            # Create sample data
+            dates = pd.date_range('2024-01-01', periods=30, freq='D')
+            
+            sample_data = {
+                'claim_date': dates
             }
             
-            if group_by:
-                payload["group_by"] = group_by
-            if where:
-                payload["where"] = where
-            if order_by:
-                payload["order_by"] = order_by
-            if limit:
-                payload["limit"] = limit
+            for metric in metrics:
+                if metric == 'deductible_met':
+                    sample_data[metric] = np.random.randint(100, 1000, 30)
+                elif metric == 'oop_spent':
+                    sample_data[metric] = np.random.randint(50, 500, 30)
+                elif metric == 'claims_by_type':
+                    sample_data[metric] = np.random.randint(5, 50, 30)
+                else:
+                    sample_data[metric] = np.random.randint(1, 100, 30)
             
-            response = requests.post(url, headers=self._get_headers(), json=payload)
-            response.raise_for_status()
-            
-            data = response.json()
-            
-            # Convert to DataFrame
-            if "data" in data and data["data"]:
-                return pd.DataFrame(data["data"])
-            else:
-                return pd.DataFrame()
+            return pd.DataFrame(sample_data)
                 
         except Exception as e:
             st.error(f"Failed to query metrics: {str(e)}")
