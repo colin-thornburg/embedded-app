@@ -13,6 +13,14 @@ sys.path.append(str(Path(__file__).parent))
 
 from config.settings import STREAMLIT_CONFIG, APP_CONFIG
 from utils.database import get_dbt_models_info, get_metrics_data
+from utils.semantic_layer import (
+    get_available_metrics,
+    get_available_dimensions,
+    query_metric_data,
+    get_claims_metrics_by_date,
+    get_member_metrics_by_department,
+    get_plan_metrics
+)
 from utils.visualizations import (
     create_metric_card, 
     create_dashboard_grid, 
@@ -40,8 +48,8 @@ def main():
     with st.sidebar:
         selected = option_menu(
             menu_title="Navigation",
-            options=["Dashboard", "Claims Analysis", "Member Analytics", "Plan Analytics", "Data Explorer"],
-            icons=["house", "file-medical", "people", "credit-card", "search"],
+            options=["Dashboard", "Claims Analysis", "Member Analytics", "Plan Analytics", "Semantic Layer", "Data Explorer"],
+            icons=["house", "file-medical", "people", "credit-card", "layers", "search"],
             menu_icon="cast",
             default_index=0,
         )
@@ -55,6 +63,8 @@ def main():
         show_member_analytics()
     elif selected == "Plan Analytics":
         show_plan_analytics()
+    elif selected == "Semantic Layer":
+        show_semantic_layer()
     elif selected == "Data Explorer":
         show_data_explorer()
 
@@ -62,99 +72,176 @@ def show_dashboard():
     """Main dashboard page"""
     st.header("📊 Executive Dashboard")
     
-    # Key metrics cards
-    col1, col2, col3, col4 = st.columns(4)
-    
-    with col1:
-        create_metric_card(
-            title="Total Claims",
-            value="1,234",
-            delta="+12%",
-            delta_color="normal"
-        )
-    
-    with col2:
-        create_metric_card(
-            title="Total Members",
-            value="456",
-            delta="+5%",
-            delta_color="normal"
-        )
-    
-    with col3:
-        create_metric_card(
-            title="Avg Claim Amount",
-            value="$1,234",
-            delta="-3%",
-            delta_color="inverse"
-        )
-    
-    with col4:
-        create_metric_card(
-            title="Deductible Met",
-            value="78%",
-            delta="+8%",
-            delta_color="normal"
-        )
-    
-    # Charts section
-    st.subheader("📈 Trends")
-    
-    # Sample data for demonstration
-    import plotly.express as px
-    import numpy as np
-    
-    # Claims over time
-    dates = pd.date_range('2024-01-01', periods=30, freq='D')
-    claims_data = pd.DataFrame({
-        'date': dates,
-        'claims': np.random.randint(10, 50, 30),
-        'amount': np.random.randint(1000, 5000, 30)
-    })
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        fig1 = px.line(claims_data, x='date', y='claims', title='Claims Count Over Time')
-        st.plotly_chart(fig1, use_container_width=True)
-    
-    with col2:
-        fig2 = px.bar(claims_data, x='date', y='amount', title='Claim Amounts Over Time')
-        st.plotly_chart(fig2, use_container_width=True)
+    # Check if semantic layer is available
+    try:
+        # Get real metrics from semantic layer
+        claims_data = get_claims_metrics_by_date()
+        member_data = get_member_metrics_by_department()
+        
+        if not claims_data.empty:
+            # Calculate summary metrics from real data
+            total_claims = claims_data['claims_by_type'].sum() if 'claims_by_type' in claims_data.columns else 0
+            total_deductible = claims_data['deductible_met'].sum() if 'deductible_met' in claims_data.columns else 0
+            total_oop = claims_data['oop_spent'].sum() if 'oop_spent' in claims_data.columns else 0
+            
+            # Key metrics cards
+            col1, col2, col3, col4 = st.columns(4)
+            
+            with col1:
+                create_metric_card(
+                    title="Total Claims",
+                    value=f"{total_claims:,.0f}",
+                    delta="+12%",
+                    delta_color="normal"
+                )
+            
+            with col2:
+                create_metric_card(
+                    title="Total Members",
+                    value=f"{member_data['member_count'].sum():,.0f}" if not member_data.empty else "0",
+                    delta="+5%",
+                    delta_color="normal"
+                )
+            
+            with col3:
+                create_metric_card(
+                    title="Deductible Met",
+                    value=f"${total_deductible:,.0f}",
+                    delta="+8%",
+                    delta_color="normal"
+                )
+            
+            with col4:
+                create_metric_card(
+                    title="Out of Pocket",
+                    value=f"${total_oop:,.0f}",
+                    delta="+3%",
+                    delta_color="normal"
+                )
+            
+            # Charts section
+            st.subheader("📈 Trends")
+            
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                if 'claim_date' in claims_data.columns and 'deductible_met' in claims_data.columns:
+                    import plotly.express as px
+                    fig1 = px.line(claims_data, x='claim_date', y='deductible_met', 
+                                 title='Deductible Met Over Time')
+                    st.plotly_chart(fig1, use_container_width=True)
+            
+            with col2:
+                if 'claim_date' in claims_data.columns and 'oop_spent' in claims_data.columns:
+                    import plotly.express as px
+                    fig2 = px.line(claims_data, x='claim_date', y='oop_spent', 
+                                 title='Out of Pocket Spending Over Time')
+                    st.plotly_chart(fig2, use_container_width=True)
+        
+        else:
+            st.warning("No data available from semantic layer. Please ensure your dbt models are built and semantic layer is configured.")
+            
+    except Exception as e:
+        st.error(f"Error loading dashboard data: {str(e)}")
+        
+        # Fallback to sample data
+        st.info("Showing sample data - configure your dbt Cloud credentials to see real data")
+        
+        col1, col2, col3, col4 = st.columns(4)
+        
+        with col1:
+            create_metric_card(
+                title="Total Claims",
+                value="1,234",
+                delta="+12%",
+                delta_color="normal"
+            )
+        
+        with col2:
+            create_metric_card(
+                title="Total Members",
+                value="456",
+                delta="+5%",
+                delta_color="normal"
+            )
+        
+        with col3:
+            create_metric_card(
+                title="Avg Claim Amount",
+                value="$1,234",
+                delta="-3%",
+                delta_color="inverse"
+            )
+        
+        with col4:
+            create_metric_card(
+                title="Deductible Met",
+                value="78%",
+                delta="+8%",
+                delta_color="normal"
+            )
 
 def show_claims_analysis():
     """Claims analysis page"""
     st.header("🏥 Claims Analysis")
     
-    # Get dbt models info
-    models_df = get_dbt_models_info()
-    
-    if not models_df.empty:
-        st.subheader("Available dbt Models")
-        st.dataframe(models_df, use_container_width=True)
-    else:
-        st.warning("No dbt models found. Make sure your dbt project is properly configured and models are built.")
-    
-    # Sample claims analysis
-    st.subheader("Claims by Type")
-    
-    # Sample data
-    claims_by_type = pd.DataFrame({
-        'claim_type': ['Medical', 'Pharmacy', 'Dental', 'Vision'],
-        'count': [450, 320, 180, 90],
-        'total_amount': [125000, 85000, 45000, 22000]
-    })
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        import plotly.express as px
-        fig = px.pie(claims_by_type, values='count', names='claim_type', title='Claims Distribution')
-        st.plotly_chart(fig, use_container_width=True)
-    
-    with col2:
-        fig = px.bar(claims_by_type, x='claim_type', y='total_amount', title='Total Amount by Claim Type')
-        st.plotly_chart(fig, use_container_width=True)
+    try:
+        # Get real claims data from semantic layer
+        claims_data = get_claims_metrics_by_date()
+        
+        if not claims_data.empty:
+            st.subheader("Claims Metrics Over Time")
+            
+            # Show claims trends
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                if 'claim_date' in claims_data.columns and 'deductible_met' in claims_data.columns:
+                    import plotly.express as px
+                    fig = px.line(claims_data, x='claim_date', y='deductible_met', 
+                                title='Deductible Met Over Time')
+                    st.plotly_chart(fig, use_container_width=True)
+            
+            with col2:
+                if 'claim_date' in claims_data.columns and 'oop_spent' in claims_data.columns:
+                    import plotly.express as px
+                    fig = px.line(claims_data, x='claim_date', y='oop_spent', 
+                                title='Out of Pocket Spending Over Time')
+                    st.plotly_chart(fig, use_container_width=True)
+            
+            # Show raw data
+            st.subheader("Claims Data")
+            create_data_table(claims_data, "Claims Metrics Data")
+            
+        else:
+            st.warning("No claims data available from semantic layer.")
+            
+    except Exception as e:
+        st.error(f"Error loading claims data: {str(e)}")
+        
+        # Fallback to sample data
+        st.info("Showing sample data - configure your dbt Cloud credentials to see real data")
+        
+        # Sample claims analysis
+        st.subheader("Claims by Type")
+        
+        # Sample data
+        claims_by_type = pd.DataFrame({
+            'claim_type': ['Medical', 'Pharmacy', 'Dental', 'Vision'],
+            'count': [450, 320, 180, 90],
+            'total_amount': [125000, 85000, 45000, 22000]
+        })
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            import plotly.express as px
+            fig = px.pie(claims_by_type, values='count', names='claim_type', title='Claims Distribution')
+            st.plotly_chart(fig, use_container_width=True)
+        
+        with col2:
+            fig = px.bar(claims_by_type, x='claim_type', y='total_amount', title='Total Amount by Claim Type')
+            st.plotly_chart(fig, use_container_width=True)
 
 def show_member_analytics():
     """Member analytics page"""
@@ -220,6 +307,104 @@ def show_plan_analytics():
     
     # Data table
     create_data_table(plan_data, "Plan Analytics Data")
+
+def show_semantic_layer():
+    """Semantic layer exploration page"""
+    st.header("🔗 dbt Semantic Layer")
+    
+    try:
+        # Get available metrics
+        st.subheader("📊 Available Metrics")
+        metrics = get_available_metrics()
+        
+        if metrics:
+            metrics_df = pd.DataFrame(metrics)
+            create_data_table(metrics_df, "Available Metrics")
+            
+            # Get dimensions for selected metrics
+            if st.button("Load Dimensions"):
+                metric_names = [m.get('name', '') for m in metrics if m.get('name')]
+                if metric_names:
+                    dimensions = get_available_dimensions(metric_names)
+                    if dimensions:
+                        st.subheader("📏 Available Dimensions")
+                        dimensions_df = pd.DataFrame(dimensions)
+                        create_data_table(dimensions_df, "Available Dimensions")
+                    else:
+                        st.warning("No dimensions found for the selected metrics.")
+        else:
+            st.warning("No metrics available. Please ensure your dbt project is properly configured and semantic layer is set up.")
+        
+        # Interactive query builder
+        st.subheader("🔍 Interactive Query Builder")
+        
+        if metrics:
+            # Metric selector
+            metric_options = [m.get('name', '') for m in metrics if m.get('name')]
+            selected_metrics = st.multiselect(
+                "Select metrics to query:",
+                options=metric_options,
+                default=metric_options[:2] if len(metric_options) >= 2 else metric_options
+            )
+            
+            if selected_metrics:
+                # Date range filter
+                col1, col2 = st.columns(2)
+                with col1:
+                    start_date = st.date_input("Start Date", value=pd.to_datetime('2024-01-01').date())
+                with col2:
+                    end_date = st.date_input("End Date", value=pd.to_datetime('2024-12-31').date())
+                
+                # Group by options
+                group_by_option = st.selectbox(
+                    "Group by:",
+                    options=["None", "Day", "Week", "Month", "Quarter", "Year"]
+                )
+                
+                if st.button("Run Query"):
+                    try:
+                        # Build query parameters
+                        group_by = None
+                        if group_by_option != "None":
+                            group_by = [{"name": "claim_date", "grain": group_by_option.lower()}]
+                        
+                        where_clause = f"{{{{ Dimension('claim__claim_date') }}}} >= '{start_date}' AND {{{{ Dimension('claim__claim_date') }}}} <= '{end_date}'"
+                        
+                        # Execute query
+                        with st.spinner("Querying semantic layer..."):
+                            results = query_metric_data(
+                                metrics=selected_metrics,
+                                group_by=group_by,
+                                where=where_clause,
+                                limit=100
+                            )
+                        
+                        if not results.empty:
+                            st.subheader("Query Results")
+                            create_data_table(results, "Semantic Layer Query Results")
+                            
+                            # Show charts
+                            if len(selected_metrics) > 0:
+                                st.subheader("Visualizations")
+                                for metric in selected_metrics:
+                                    if metric in results.columns:
+                                        import plotly.express as px
+                                        if group_by_option != "None" and 'claim_date' in results.columns:
+                                            fig = px.line(results, x='claim_date', y=metric, title=f'{metric} Over Time')
+                                        else:
+                                            fig = px.bar(results, x=metric, title=f'{metric} Distribution')
+                                        st.plotly_chart(fig, use_container_width=True)
+                        else:
+                            st.warning("No results returned from the query.")
+                            
+                    except Exception as e:
+                        st.error(f"Query failed: {str(e)}")
+        else:
+            st.info("Configure your dbt Cloud credentials to explore the semantic layer.")
+            
+    except Exception as e:
+        st.error(f"Error loading semantic layer data: {str(e)}")
+        st.info("Please ensure your dbt Cloud credentials are configured in the .env file.")
 
 def show_data_explorer():
     """Data explorer page"""
