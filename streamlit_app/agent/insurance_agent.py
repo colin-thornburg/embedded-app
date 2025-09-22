@@ -16,6 +16,7 @@ from utils.mcp_client import (
     mcp_query_metrics,
     is_mcp_available
 )
+from utils.semantic_layer import DbtSemanticLayer
 from utils.security import get_company_filter, sanitize_user_input
 
 logger = logging.getLogger(__name__)
@@ -41,6 +42,7 @@ class InsuranceAgent:
         self.client = openai.OpenAI(api_key=api_key) if api_key else None
         self.available_metrics = self._load_available_metrics()
         self.available_dimensions = self._load_available_dimensions()
+        self.semantic_layer = DbtSemanticLayer()
 
     def _load_available_metrics(self) -> List[Dict]:
         """Load available metrics from MCP server"""
@@ -274,14 +276,29 @@ Always be helpful and explain insurance terms when needed."""
         else:
             query_args['where'] = company_filter
 
-        # Execute query via MCP
+        # Execute query via semantic layer (more reliable than MCP)
         logger.info(f"Executing metrics query: {query_args}")
-        raw_result = mcp_query_metrics(query_args)
-
-        # Parse result
-        if isinstance(raw_result, str):
-            return json.loads(raw_result)
-        return raw_result
+        
+        try:
+            # Use semantic layer instead of MCP for better reliability
+            df = self.semantic_layer.query_metrics(
+                metrics=query_args.get('metrics', []),
+                group_by=query_args.get('group_by'),
+                where=query_args.get('where'),
+                order_by=query_args.get('order_by'),
+                limit=query_args.get('limit')
+            )
+            
+            # Convert DataFrame to list of dicts for JSON serialization
+            return df.to_dict('records')
+            
+        except Exception as e:
+            logger.error(f"Semantic layer query failed, falling back to MCP: {e}")
+            # Fallback to MCP if semantic layer fails
+            raw_result = mcp_query_metrics(query_args)
+            if isinstance(raw_result, str):
+                return json.loads(raw_result)
+            return raw_result
 
     def _generate_response_from_data(self, data: Any, user_question: str, query_args: Dict) -> Dict[str, Any]:
         """Generate user-friendly response from query data"""

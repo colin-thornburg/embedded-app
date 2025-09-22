@@ -205,7 +205,7 @@ def mcp_query_metrics(payload: Dict[str, Any]) -> str:
     logger.debug(f"Query payload: {json.dumps(payload, indent=2)}")
     result = call_mcp_tool("query_metrics", payload)
     # Check if the result is an error message
-    if result.startswith("Expecting value") or result.startswith("Error") or result.startswith("errors"):
+    if result.startswith("message=") or result.startswith("Error") or result.startswith("errors") or "Got error" in result:
         logger.error(f"MCP query returned error: {result}")
         raise RuntimeError(f"dbt MCP query failed: {result}")
     logger.info("MCP query executed successfully")

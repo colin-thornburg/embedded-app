@@ -56,6 +56,9 @@ class DbtSemanticLayer:
             "company": "member_claims__company",
             "plan": "member_details__plan",
         }
+        
+        # Add company_id dimension mapping
+        self.dimension_identifier_map["company_id"] = "member_claims__company_id"
     
     def _get_headers(self) -> Dict[str, str]:
         """Get headers for dbt Cloud API requests"""
