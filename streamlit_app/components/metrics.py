@@ -68,12 +68,12 @@ def render_key_metrics():
                 help="Total out-of-pocket spending this year"
             )
 
-            # Claim Count
-            claim_count = metrics_data.get('claim_count', 0)
+            # Claims by Type
+            claims_by_type = metrics_data.get('claims_by_type', 0)
             st.metric(
-                label="📋 Total Claims",
-                value=f"{claim_count:,}",
-                help="Number of claims this year"
+                label="📋 Claims by Type",
+                value=f"{claims_by_type:,.0f}",
+                help="Claims breakdown by type this year"
             )
 
         else:
@@ -119,7 +119,7 @@ def load_quick_metrics() -> Optional[Dict[str, Any]]:
 
         # Query for key metrics
         query_args = {
-            "metrics": ["deductible_met", "oop_spent", "claim_count"],
+            "metrics": ["deductible_met", "oop_spent", "claims_by_type"],
             "where": f"{{{{ Dimension('company_id') }}}} = {company_id}"
         }
 

@@ -72,7 +72,7 @@ class InsuranceAgent:
             {"name": "total_claims", "description": "Total claim amount", "type": "SIMPLE"},
             {"name": "paid_amount", "description": "Amount paid by insurance", "type": "SIMPLE"},
             {"name": "member_responsibility", "description": "Member out-of-pocket amount", "type": "SIMPLE"},
-            {"name": "claim_count", "description": "Number of claims", "type": "SIMPLE"},
+            {"name": "claims_by_type", "description": "Claims breakdown by type", "type": "SIMPLE"},
             {"name": "deductible_met", "description": "YTD deductible met", "type": "SIMPLE"},
             {"name": "oop_spent", "description": "YTD out-of-pocket spent", "type": "SIMPLE"},
         ]
@@ -168,9 +168,9 @@ GUIDELINES:
 
 COMMON QUERY PATTERNS:
 - "How much of my deductible have I met?" → deductible_met metric
-- "Show my claims this year" → claim_count, total_claims with current year filter
+- "Show my claims this year" → claims_by_type with current year filter
 - "What's my out-of-pocket spending?" → oop_spent metric
-- "Claims by type" → claim_count grouped by claim_type
+- "Claims by type" → claims_by_type grouped by claim_type
 - "Last month's claims" → metrics with claim_date dimension
 
 Always be helpful and explain insurance terms when needed."""
