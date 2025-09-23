@@ -41,7 +41,7 @@ semantic_models:
         expr: company_id
     
     measures:
-      - name: total_claims
+      - name: total_claim_amount
         description: "Total claim amount"
         agg: sum
         expr: claim_amount
@@ -61,6 +61,8 @@ semantic_models:
   - name: members
     description: "Member information with plan details"
     model: ref('dim_members')
+    defaults:
+      agg_time_dimension: enrollment_date
     
     entities:
       - name: member
@@ -69,9 +71,6 @@ semantic_models:
       - name: company
         type: foreign
         expr: company_id
-      - name: plan
-        type: foreign
-        expr: plan_id
     
     dimensions:
       - name: first_name
@@ -101,84 +100,33 @@ semantic_models:
           time_granularity: day
         expr: enrollment_date
     
-    defaults:
-      agg_time_dimension: enrollment_date
-    
     measures:
       - name: member_count
         description: "Count of members"
         agg: count_distinct
         expr: member_id
 
-  - name: plans
-    description: "Health plan information"
-    model: ref('dim_plans')
-    
-    entities:
-      - name: plan
-        type: primary
-        expr: plan_id
-      - name: company
-        type: foreign
-        expr: company_id
-    
-    dimensions:
-      - name: plan_name
-        type: categorical
-        expr: plan_name
-      - name: plan_type
-        type: categorical
-        expr: plan_type
-      - name: coinsurance_percentage
-        type: categorical
-        expr: coinsurance_percentage
-      - name: copay_primary
-        type: categorical
-        expr: copay_primary
-      - name: copay_specialist
-        type: categorical
-        expr: copay_specialist
-    
-    measures:
-      - name: annual_deductible
-        description: "Annual deductible for individual"
-        agg: max
-        expr: annual_deductible_individual
-      - name: oop_max
-        description: "Out of pocket maximum for individual"
-        agg: max
-        expr: oop_max_individual
-      - name: monthly_premium
-        description: "Monthly premium for employee"
-        agg: max
-        expr: premium_monthly_employee
-
-# Simplified and Working Metrics
 metrics:
-  - name: ytd_deductible_met
-    description: "Amount of deductible met year-to-date"
-    type: simple
-    label: "YTD Deductible Met"
-    type_params:
-      measure: member_responsibility
-    filter: |
-      {{ Dimension('claim__claim_date') }} >= '2024-01-01'
-  
-  - name: ytd_oop_spent
-    description: "Out of pocket spent year-to-date"
-    type: simple
-    label: "YTD OOP Spent"
-    type_params:
-      measure: member_responsibility
-    filter: |
-      {{ Dimension('claim__claim_date') }} >= '2024-01-01'
-  
   - name: total_claim_amount
     description: "Total dollar amount of all claims"
     type: simple
     label: "Total Claim Amount"
     type_params:
-      measure: total_claims
+      measure: total_claim_amount
+  
+  - name: total_claims_count
+    description: "Total number of claims"
+    type: simple
+    label: "Total Claims Count"
+    type_params:
+      measure: claim_count
+  
+  - name: total_member_responsibility
+    description: "Total member responsibility amount"
+    type: simple
+    label: "Total Member Responsibility"
+    type_params:
+      measure: member_responsibility
   
   - name: total_paid_by_insurance
     description: "Total amount paid by insurance"
@@ -187,33 +135,18 @@ metrics:
     type_params:
       measure: paid_amount
   
-  - name: total_claims_count
-    description: "Total number of claims"
-    type: simple
-    label: "Total Claims"
-    type_params:
-      measure: claim_count
-  
   - name: active_members
     description: "Count of active members"
     type: simple
     label: "Active Members"
     type_params:
       measure: member_count
-
-# Ratio Metrics (More Advanced)
-  - name: avg_claim_amount
-    description: "Average claim amount"
-    type: ratio
-    label: "Average Claim Amount"
-    type_params:
-      numerator: total_claims
-      denominator: claim_count
   
-  - name: member_responsibility_rate
-    description: "Percentage of claims that are member responsibility"
-    type: ratio
-    label: "Member Responsibility Rate"
+  - name: ytd_member_responsibility
+    description: "Member responsibility amount year-to-date"
+    type: simple
+    label: "YTD Member Responsibility"
     type_params:
-      numerator: member_responsibility
-      denominator: total_claims
+      measure: member_responsibility
+    filter: |
+      {{ Dimension('claim__claim_date') }} >= '2024-01-01'
