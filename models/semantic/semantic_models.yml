@@ -150,3 +150,11 @@ metrics:
       measure: member_responsibility
     filter: |
       {{ Dimension('claim__claim_date') }} >= '2024-01-01'
+metrics:
+  - name: average_claim_amount
+    description: "Average dollar amount of claims"
+    type: ratio
+    label: "Average Claim Amount"
+    type_params:
+      numerator: total_claim_amount
+      denominator: total_claims_count
