@@ -1,0 +1,33 @@
+models:
+- name: dim_providers
+  description: This model provides detailed information about healthcare providers,
+    including their specialties, contact information, and network status. It is used
+    to identify providers who are accepting new patients and to assess their quality
+    ratings within the network.
+  columns:
+  - name: provider_id
+    description: A unique identifier for each healthcare provider.
+  - name: provider_name
+    description: The full name of the healthcare provider.
+  - name: specialty
+    description: The medical specialty of the healthcare provider.
+  - name: address
+    description: The street address of the healthcare provider.
+  - name: city
+    description: The city where the healthcare provider is located.
+  - name: state
+    description: The state where the healthcare provider is located.
+  - name: zip
+    description: The postal code for the healthcare provider's location.
+  - name: phone
+    description: The contact phone number for the healthcare provider.
+  - name: accepting_new_patients
+    description: Indicates whether the provider is currently accepting new patients.
+  - name: quality_rating
+    description: A numerical rating representing the quality of the healthcare provider.
+  - name: company_id
+    description: A unique identifier for the company associated with the provider.
+  - name: network_status
+    description: The provider's status within the healthcare network.
+  - name: is_in_network
+    description: Indicates whether the provider is part of the healthcare network.
